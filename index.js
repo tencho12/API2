@@ -38,16 +38,62 @@ app.listen(port, () => {
 });
 
 
-app.get('/home', function (req, res) {
-    var sql = "SELECT room_tb.room_id, room_tb.room_name, room_tb.automated, status_tb.component_id, status_tb.component_name, status_tb.status FROM status_tb INNER JOIN room_tb ON status_tb.room_id = room_tb.room_id";
-    mysqlConnection.query(sql, (err, rows, fields) => {
+// app.get('/home', function (req, res) {
+
+//     
+// }); 
+
+
+
+app.post('/getDetails', function (req, res) {
+    var sql = "SELECT house_number FROM user_tb WHERE email=?";
+    var value = req.body.email
+    mysqlConnection.query(sql, value, (err, rows, fields) => {
+        if (!err) {
+            sql = "SELECT * from room_tb WHERE house_number=?";
+            value = rows[0].house_number
+            mysqlConnection.query(sql, value, (err, rows, fields) => { 
+                if (rows) {
+                    res.send(rows)
+                } else {
+                    res.send(err)
+                }
+            });
+        }
+        else
+            res.send("error")
+    });
+});
+
+app.post('/comments', function (req, res) {
+    var sql = "INSERT INTO comment_tb (email,comment) VALUES(?,?)";
+    var value = [req.body.email, req.body.comment]
+    mysqlConnection.query(sql, value, (err, rows, fields) => {
+        if (!err) {
+            res.send({
+                err: 'false',
+                mess: 'Thank you for your comments, We are always'
+            })
+        }
+        else
+            res.send({
+                err: 'true',
+                mess: 'Sorry, something is wrong'
+            })
+    });
+});
+
+app.post('/getStatus', function (req, res) {
+    var sql = "SELECT * from status_tb WHERE room_id=?";
+    var value = req.body.room_id
+    mysqlConnection.query(sql, value, (err, rows, fields) => {
         if (!err) {
             res.send(rows)
         }
         else
             res.send("error")
     });
-}); 
+});
 
 app.post('/updateAuto', function (req, res) {
     var sql = "UPDATE room_tb SET automated=? WHERE room_id=?";
@@ -60,6 +106,7 @@ app.post('/updateAuto', function (req, res) {
             res.send("error")
     });
 });
+
 
 app.post('/updateStatus', function (req, res) {
     var sql = "UPDATE status_tb SET status=? WHERE component_id=?";
