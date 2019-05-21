@@ -38,10 +38,19 @@ app.listen(port, () => {
 });
 
 
-// app.get('/home', function (req, res) {
-
-//     
-// }); 
+app.get('/getsensorVal', function (req, res) {
+    sql = "SELECT value from sensor_tb WHERE id=1"
+    mysqlConnection.query(sql, (err, rows, fields) => {
+        if (err)
+            console.log(err)
+        else {
+           
+            res.send(rows)
+        }
+            
+    })    
+    
+}); 
 
 
 
@@ -138,7 +147,7 @@ app.post('/login', function (req, res) {
                     let token = jwt.sign(userData, process.env.SECRET_KEY, {
                         expiresIn: '1440h'
                     })
-                    res.send(token)
+                    res.status(200).send(token)
                 } else {
                     res.send({
                         errorOccurred: 'true',
@@ -222,3 +231,46 @@ app.post('/updateProfile', function (req, res) {
         }
     });
 });
+
+app.get('/sensorValues', function (req, res) {
+    sql = "SELECT * from constant_tb";
+    mysqlConnection.query(sql, (err, rows, fields) => {
+        if (err)
+            res.send(err)
+        else
+            res.send(rows)
+    })
+});
+
+app.post('/updateValues', function (req, res) {
+  //  console.log(req.body.heaterOnAt)
+    sql = "UPDATE constant_tb SET value=? WHERE id=1";
+    value = req.body.fanOnAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { });
+
+    sql = "UPDATE constant_tb SET value=? WHERE id=2";
+    value = req.body.fanOffAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { });
+
+    sql = "UPDATE constant_tb SET value=? WHERE id=3";
+    value = req.body.heaterOnAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { });
+
+    sql = "UPDATE constant_tb SET value=? WHERE id=4";
+    value = req.body.fanOffAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { });
+
+    sql = "UPDATE constant_tb SET value=? WHERE id=5";
+    value = req.body.lightOnAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { });
+
+    sql = "UPDATE constant_tb SET value=? WHERE id=6";
+    value = req.body.lightOffAt
+    mysqlConnection.query(sql, value, (err, rows, fields) => { 
+        if (err)
+            console.log(err)
+        else
+            res.send({error:false})
+    })
+
+})
