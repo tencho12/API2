@@ -38,13 +38,13 @@ app.listen(port, () => {
 });
 
 
-app.get('/getsensorVal', function (req, res) {
-    sql = "SELECT value from sensor_tb WHERE id=1"
-    mysqlConnection.query(sql, (err, rows, fields) => {
+app.post('/getTemperature', function (req, res) {
+    sql = "SELECT id, sensor_type, value from sensor_tb WHERE room_id=?"
+    val=[req.body.room_id]
+    mysqlConnection.query(sql, val, (err, rows, fields) => {
         if (err)
             console.log(err)
         else {
-           
             res.send(rows)
         }
             
